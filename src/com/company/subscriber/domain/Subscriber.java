@@ -19,6 +19,8 @@ public class Subscriber {
         this.street = street;
     }
 
+
+
     public void setName(String name) {
         this.name = name;
     }
