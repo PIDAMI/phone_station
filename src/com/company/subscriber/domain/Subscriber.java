@@ -1,6 +1,8 @@
 package com.company.subscriber.domain;
 
-public class Subscriber {
+import com.company.common.IEntity;
+
+public class Subscriber implements IEntity {
 
     private final Long id;
     private String name;
@@ -41,6 +43,7 @@ public class Subscriber {
         this.street = street;
     }
 
+    @Override
     public Long getId() {
         return id;
     }

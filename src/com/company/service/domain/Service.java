@@ -1,6 +1,8 @@
 package com.company.service.domain;
 
-public class Service {
+import com.company.common.IEntity;
+
+public class Service implements IEntity {
 
     private final Long id;
     private String title;
@@ -26,6 +28,7 @@ public class Service {
         this.duration = duration;
     }
 
+    @Override
     public Long getId() {
         return id;
     }
