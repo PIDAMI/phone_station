@@ -22,7 +22,7 @@ public class SubscriberDao implements ISubscriberDao {
         CITY("city"),
         STREET("street");
 
-        private final String val;
+        private final String val; // name of field in db
         Fields(String val){this.val=val;}
 
         @Override
