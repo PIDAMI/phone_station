@@ -4,12 +4,13 @@ import com.company.common.IEntity;
 
 public class Subscriber implements IEntity {
 
-    private final Long id;
+    private Long id;
     private String name;
     private Integer age;
     private String phone;
     private String city;
     private String street;
+
 
     public Subscriber(Long id, String name, Integer age,
                       String phone, String city, String street) {
@@ -49,7 +50,7 @@ public class Subscriber implements IEntity {
     }
 
     public String getName() {
-        return name;
+        return name == null ? "" : name;
     }
 
     public Integer getAge() {

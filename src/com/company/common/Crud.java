@@ -1,15 +1,10 @@
 package com.company.common;
 
-import com.company.subscriber.dao.SubscriberDao;
-import com.company.subscriber.domain.Subscriber;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class Crud<T extends IEntity> implements ICrud<T>{
@@ -17,7 +12,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
     private final String table;
     private final List<String> fields; // names of fields except for id
     private final String id_field; // name of id field
-    private final Connection connection;
+    protected final Connection connection;
 
     public String allFieldsWithQM(){
         return  fields.stream()
@@ -46,6 +41,8 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
         this.fields = fields;
         this.id_field = id_field;
     }
+
+
 
 
     private String getStatement(Long id){
@@ -81,49 +78,78 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
         return "DROP TABLE " + table;
     }
 
+    private String getTableSizeStatement(){
+        return "SELECT COUNT(*) FROM " + table;
+    }
+
     abstract protected List<T> getEntities(PreparedStatement statement)
-            throws SQLException
-//    {
-//        List<T> subscribers = new ArrayList<>();
-//        ResultSet rs = statement.executeQuery();
-//        while (rs.next()){
-//            subscribers.add(new Subscriber(
-//                    rs.getLong(SubscriberDao.Fields.ID.toString()),
-//                    rs.getString(SubscriberDao.Fields.NAME.toString()),
-//                    rs.getInt(SubscriberDao.Fields.AGE.toString()),
-//                    rs.getString(SubscriberDao.Fields.PHONE.toString()),
-//                    rs.getString(SubscriberDao.Fields.CITY.toString()),
-//                    rs.getString(SubscriberDao.Fields.STREET.toString()))
-//            );
-//        }
-//        return subscribers;
-//    }
-;
+            throws SQLException;
 
 
     abstract protected void fillStatement(PreparedStatement statement, T entity)
             throws SQLException;
 
 
+    protected List<T> getByStringField(String query,String field){
+        try {
+            PreparedStatement statement =
+                    connection.prepareStatement(query);
+            statement.setString(1,field);
+            return getEntities(statement);
+        } catch (SQLException e) {
+            System.out.println("failed to get entries with value"
+                    + field);
+            return new ArrayList<>();
+        }
+    }
+
+    protected List<T> getByIntField(String query,Integer field){
+        try {
+            PreparedStatement statement =
+                    connection.prepareStatement(query);
+            statement.setInt(1,field);
+            return getEntities(statement);
+        } catch (SQLException e) {
+            System.out.println("failed to get entries with value"
+                    + field);
+            return new ArrayList<>();
+        }
+    }
+
     @Override
     public String getTableName() {
         return table;
     }
 
+    @Override
+    public Long getTableSize(){
+        try {
+            PreparedStatement statement =
+                    connection.prepareStatement(getTableSizeStatement());
+            ResultSet rs = statement.executeQuery();
+            return rs.getLong(1);
+
+        } catch (SQLException e) {
+            System.out.println("failed to count the size of " + table);
+            return -1L;
+        }
+    }
 
     @Override
-    public Boolean create(T entity) {
-        boolean isSuccess = false;
+    public Long create(T entity) {
+        Long id = -1L;
         try {
             PreparedStatement statement =
                     connection.prepareStatement(createStatement());
             fillStatement(statement,entity);
             int res = statement.executeUpdate();
-            isSuccess = res > 0;
+            if (res > 0)
+                id = getTableSize();
+
         } catch (SQLException e) {
-            System.out.println("failed to create new " + entity.toString() + e.getMessage());
+            System.out.println("failed to create new entry");
         }
-        return isSuccess;
+        return id;
     }
 
     @Override
@@ -158,7 +184,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
     }
 
 
-    // name surname where id=1
+
     @Override
     public Boolean update(T entity) {
         boolean isSuccess = false;

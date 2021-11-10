@@ -34,28 +34,7 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
 
 
     private final String table = "subscriber";
-//
-//    private final String createStatement =
-//            "INSERT INTO " + table + Fields.asTupleNoId() +
-//                    " VALUES (?,?,?,?,?)";
-//
-//    private final String getStatement =
-//            "SELECT * FROM " + table + " WHERE "
-//                    + Fields.ID.toStringWithQM();
-//
-//    private final String getAllStatement =
-//            "SELECT * FROM " + table;
-//
-//    private final String updateStatement =
-//            "UPDATE " + table +
-//            " SET " + Fields.toStringAllWithQM() +
-//            " WHERE " + Fields.ID.toStringWithQM();
-//
-//    private final String deleteStatement =
-//            "DELETE * FROM" + table +
-//            " WHERE " + Fields.ID.toStringWithQM();
-//
-//    private final String truncateStatement = "DROP TABLE " + table;
+
 
     private final String getOlderThanStatement = "SELECT * FROM " + table +
             "WHERE " + Fields.AGE.toString() + " >?";
@@ -74,18 +53,12 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
 
 
 
-
-
-    private final Connection connection;
-
-
     public SubscriberDao(Connection connection) {
         super(connection,"subscriber",
                 Arrays.stream(Fields.values())
                         .filter(w->!w.equals(Fields.ID))
                         .map(Fields::toString).toList(),
                 Fields.ID.toString());
-        this.connection = connection;
     }
 
     @Override
@@ -118,6 +91,100 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
         statement.setString(4,entity.getCity());
         statement.setString(5,entity.getStreet());
     }
+
+
+    @Override
+    public List<Subscriber> getOlderThan(int age) {
+        try {
+            PreparedStatement statement =
+                    connection.prepareStatement(getOlderThanStatement);
+            statement.setInt(1,age);
+            return getEntities(statement);
+
+        } catch (SQLException e) {
+            System.out.println("failed to get subscribers older than " + age);
+            return new ArrayList<>();
+        }
+    }
+
+
+    @Override
+    public List<Subscriber> getByName(String name) {
+        return getByStringField(getByNameStatement,name);
+    }
+
+    @Override
+    public List<Subscriber> getByPhone(String phone) {
+        try {
+            PreparedStatement statement =
+                    connection.prepareStatement(getByPhoneStatement);
+            statement.setString(1,phone);
+            return getEntities(statement);
+        } catch (SQLException e) {
+            System.out.println("failed to get subscribers with phone "
+                    + phone);
+            return new ArrayList<>();
+        }
+
+    }
+
+    @Override
+    public List<Subscriber> getByCity(String city) {
+        try {
+            PreparedStatement statement =
+                    connection.prepareStatement(getByCityStatement);
+            statement.setString(1,city);
+            return getEntities(statement);
+        } catch (SQLException e) {
+            System.out.println("failed to get subscriber with city "
+                    + city);
+            return new ArrayList<>();
+        }
+
+    }
+
+
+
+    @Override
+    public int deleteByCity(String city) {
+        int deleted = 0;
+        try {
+            PreparedStatement statement =
+                    connection.prepareStatement(deleteByCityStatement);
+            statement.setString(1,city);
+            deleted = statement.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println("failed to delete subscriber with city"
+                    + city);
+        }
+
+        return deleted;
+    }
+
+
+    //
+//    private final String createStatement =
+//            "INSERT INTO " + table + Fields.asTupleNoId() +
+//                    " VALUES (?,?,?,?,?)";
+//
+//    private final String getStatement =
+//            "SELECT * FROM " + table + " WHERE "
+//                    + Fields.ID.toStringWithQM();
+//
+//    private final String getAllStatement =
+//            "SELECT * FROM " + table;
+//
+//    private final String updateStatement =
+//            "UPDATE " + table +
+//            " SET " + Fields.toStringAllWithQM() +
+//            " WHERE " + Fields.ID.toStringWithQM();
+//
+//    private final String deleteStatement =
+//            "DELETE * FROM" + table +
+//            " WHERE " + Fields.ID.toStringWithQM();
+//
+//    private final String truncateStatement = "DROP TABLE " + table;
 
 
 //    @Override
@@ -231,82 +298,4 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
 
 
 
-    @Override
-    public List<Subscriber> getOlderThan(int age) {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getOlderThanStatement);
-            statement.setInt(1,age);
-            return getEntities(statement);
-
-        } catch (SQLException e) {
-            System.out.println("failed to get subscribers older than " + age);
-            return new ArrayList<>();
-        }
-    }
-
-
-    @Override
-    public List<Subscriber> getByName(String name) {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getByNameStatement);
-            statement.setString(1,name);
-            return getEntities(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get subscribers with name "
-                    + name);
-            return new ArrayList<>();
-        }
-
-    }
-
-    @Override
-    public List<Subscriber> getByPhone(String phone) {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getByPhoneStatement);
-            statement.setString(1,phone);
-            return getEntities(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get subscribers with phone "
-                    + phone);
-            return new ArrayList<>();
-        }
-
-    }
-
-    @Override
-    public List<Subscriber> getByCity(String city) {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getByCityStatement);
-            statement.setString(1,city);
-            return getEntities(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get subscriber with city "
-                    + city);
-            return new ArrayList<>();
-        }
-
-    }
-
-
-
-    @Override
-    public int deleteByCity(String city) {
-        int deleted = 0;
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(deleteByCityStatement);
-            statement.setString(1,city);
-            deleted = statement.executeUpdate();
-
-        } catch (SQLException e) {
-            System.out.println("failed to delete subscriber with city"
-                    + city);
-        }
-
-        return deleted;
-    }
 }

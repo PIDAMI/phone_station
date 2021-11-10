@@ -4,7 +4,7 @@ import com.company.common.IEntity;
 
 public class Service implements IEntity {
 
-    private final Long id;
+    private Long id;
     private String title;
     private int cost;
     private int duration; //in days
@@ -16,22 +16,21 @@ public class Service implements IEntity {
         this.duration = duration;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setCost(int cost) {
-        this.cost = cost;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
 
     @Override
     public Long getId() {
         return id;
     }
+
+
+    public void setTitle(String title) {this.title = title;}
+
+    public void setCost(int cost) {this.cost = cost;}
+
+    public void setDuration(int duration) {this.duration = duration;}
+
+    public void setId(Long id ){ this.id = id;}
+
 
     public String getTitle() {
         return title;
