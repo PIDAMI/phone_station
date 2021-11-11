@@ -80,17 +80,17 @@ public class ServiceDao extends Crud<Service> implements IServiceDao {
 
 
     @Override
-    public List<Service> getByTitle(String title) {
+    public List<Service> getByTitle(String title) throws SQLException {
         return getByStringField(getByTitleStatement,title);
     }
 
     @Override
-    public List<Service> getCostMoreThan(int cost) {
+    public List<Service> getCostMoreThan(int cost) throws SQLException {
         return getByIntField(getCostLessThanStatement,cost);
     }
 
     @Override
-    public List<Service> getByDuration(int duration) {
+    public List<Service> getByDuration(int duration) throws SQLException {
         return getByIntField(getByDurationStatement,duration);
     }
 }

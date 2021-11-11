@@ -80,59 +80,45 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
     }
 
     private String getTableSizeStatement(){
-        return "SELECT COUNT(*) FROM " + table;
+        return "SELECT MAX("+id_field+") FROM " + table;
     }
 
     abstract protected List<T> getEntities(PreparedStatement statement)
             throws SQLException;
-
-//
-//    abstract protected List<T> getEntities(PreparedStatement statement,
-//                                           Callable<T> constructor) throws SQLException;
-
 
 
     abstract protected void fillStatement(PreparedStatement statement, T entity)
             throws SQLException;
 
 
-    protected List<T> getByStringField(String query,String field){
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(query);
-            statement.setString(1,field);
-            return getEntities(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get entries with value"
-                    + field);
-            return new ArrayList<>();
-        }
+    protected List<T> getByStringField(String query,String field)
+            throws SQLException{
+
+        PreparedStatement statement =
+                connection.prepareStatement(query);
+        statement.setString(1,field);
+        return getEntities(statement);
+
     }
 
-    protected List<T> getByIntField(String query,Integer field){
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(query);
-            statement.setInt(1,field);
-            return getEntities(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get entries with value"
-                    + field);
-            return new ArrayList<>();
-        }
+    protected List<T> getByIntField(String query,Integer field)
+        throws  SQLException{
+
+        PreparedStatement statement =
+                connection.prepareStatement(query);
+        statement.setInt(1,field);
+        return getEntities(statement);
+
     }
 
-    protected List<T> getByBoolField(String query,Boolean field){
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(query);
-            statement.setBoolean(1,field);
-            return getEntities(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get entries with value"
-                    + field);
-            return new ArrayList<>();
-        }
+    protected List<T> getByBoolField(String query,Boolean field)
+            throws SQLException{
+
+        PreparedStatement statement =
+                connection.prepareStatement(query);
+        statement.setBoolean(1,field);
+        return getEntities(statement);
+
     }
 
 //    protected List<T> getByLongField(String query,Long field){
@@ -155,117 +141,91 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
     }
 
     @Override
-    public Long getTableSize(){
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getTableSizeStatement());
-            ResultSet rs = statement.executeQuery();
-            return rs.getLong(1);
+    public Long getTableSize() throws SQLException {
 
-        } catch (SQLException e) {
-            System.out.println("failed to count the size of " + table);
-            return -1L;
-        }
+        PreparedStatement statement =
+                connection.prepareStatement(getTableSizeStatement());
+        ResultSet rs = statement.executeQuery();
+        return rs.getLong(1);
+
     }
 
     @Override
-    public Long create(T entity) {
-        Long id = -1L;
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(createStatement());
-            fillStatement(statement,entity);
-            int res = statement.executeUpdate();
-            if (res > 0)
-                id = getTableSize();
+    public Long create(T entity) throws SQLException {
+        Long id = 0L;
+        PreparedStatement statement =
+                connection.prepareStatement(createStatement());
+        fillStatement(statement,entity);
+        int res = statement.executeUpdate();
+        if (res > 0)
+            id = getTableSize();
 
-        } catch (SQLException e) {
-            System.out.println("failed to create new entry");
-        }
         return id;
     }
 
     @Override
-    public T get(Long id) {
+    public T get(Long id) throws SQLException {
         T res = null;
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getStatement());
-            statement.setLong(1,id);
-            List<T> entities = getEntities(statement);
-            if (entities.size() > 0)
-                 res = entities.get(0);
 
-        } catch (SQLException e) {
-            System.out.println("failed to get entry with id "
-                    + id);
-        }
+        PreparedStatement statement =
+                connection.prepareStatement(getStatement());
+        statement.setLong(1,id);
+        List<T> entities = getEntities(statement);
+        if (entities.size() > 0)
+             res = entities.get(0);
+
+
         return res;
     }
 
     @Override
-    public List<T> getAll() {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getAllStatement());
-            return getEntities(statement);
+    public List<T> getAll() throws SQLException {
 
-        } catch (SQLException e) {
-            System.out.println("failed to get all entries in table " + table);
-            return new ArrayList<>();
-        }
+        PreparedStatement statement =
+                connection.prepareStatement(getAllStatement());
+        return getEntities(statement);
+
+
     }
 
 
 
     @Override
-    public Boolean update(T entity) {
+    public Boolean update(T entity) throws SQLException {
         boolean isSuccess = false;
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(updateStatement());
-            fillStatement(statement,entity);
-            statement.setLong(fields.size() + 1,entity.getId());
-            int res = statement.executeUpdate();
-            isSuccess = res > 0;
+        PreparedStatement statement =
+                connection.prepareStatement(updateStatement());
+        fillStatement(statement,entity);
+        statement.setLong(fields.size() + 1,entity.getId());
+        int res = statement.executeUpdate();
+        isSuccess = res > 0;
 
-        } catch (SQLException e) {
-            System.out.println("failed to update entry "
-                    + entity.getId());
-        }
         return isSuccess;
     }
 
     @Override
-    public Boolean delete(T entity) {
+    public Boolean delete(T entity) throws SQLException {
         boolean isSuccess = false;
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(deleteStatement());
-            statement.setLong(1,entity.getId());
-            int res = statement.executeUpdate();
-            isSuccess = res > 0;
 
-        } catch (SQLException e) {
-            System.out.println("failed to delete entry with id " +
-                    + entity.getId());
-        }
+        PreparedStatement statement =
+                connection.prepareStatement(deleteStatement());
+        statement.setLong(1,entity.getId());
+        int res = statement.executeUpdate();
+        isSuccess = res > 0;
+
         return isSuccess;
     }
 
     @Override
-    public Boolean truncate() {
+    public Boolean truncate() throws SQLException {
         boolean isSuccess = false;
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(truncateStatement());
-            int res = statement.executeUpdate();
-            isSuccess = res > 0;
 
-        } catch (SQLException e) {
-            System.out.println("failed to truncate table "
-                    + table);
-        }
+        PreparedStatement statement =
+                connection.prepareStatement(truncateStatement());
+        int res = statement.executeUpdate();
+        isSuccess = res > 0;
+
+
         return isSuccess;
 
     }

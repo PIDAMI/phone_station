@@ -1,6 +1,12 @@
 package com.company.customer.domain;
 
 import com.company.common.IEntity;
+import com.company.customer.dao.CustomerDao;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Customer implements IEntity {
 

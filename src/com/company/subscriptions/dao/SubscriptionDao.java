@@ -71,8 +71,7 @@ public class SubscriptionDao extends Crud<Subscription> implements ISubscription
 
 
 
-    public SubscriptionDao(Connection connection, String table,
-                           List<String> fields, String id_field) {
+    public SubscriptionDao(Connection connection) {
         super(connection,"subscription",
                 Arrays.stream(SubscriptionDao.Fields.values())
                         .filter(w->!w.equals(SubscriptionDao.Fields.ID))
@@ -135,7 +134,8 @@ public class SubscriptionDao extends Crud<Subscription> implements ISubscription
     }
 
     @Override
-    protected void fillStatement(PreparedStatement statement, Subscription entity)
+    protected void fillStatement(PreparedStatement statement,
+                                 Subscription entity)
             throws SQLException {
 
         statement.setLong(1,entity.getCustomerId());
@@ -145,70 +145,55 @@ public class SubscriptionDao extends Crud<Subscription> implements ISubscription
     }
 
     @Override
-    public List<Subscription> getActiveSub() {
+    public List<Subscription> getActiveSub() throws SQLException {
         return getByBoolField(getActiveStatement,true);
     }
 
     @Override
-    public int deleteInactive() {
+    public int deleteInactive() throws SQLException {
         int res = -1;
-        try {
             PreparedStatement statement =
                     connection.prepareStatement(deleteInactiveStatement);
             statement.setBoolean(1,false);
             res = statement.executeUpdate();
 
-        } catch (SQLException e) {
-            System.out.println("failed to delete inactive subscriptions");
-        }
         return res;
     }
 
     @Override
-    public List<Service> getServicesByCustomer(Customer customer) {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getServicesByCustomerStatement);
-            statement.setLong(1,customer.getId());
-            return getServices(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get services purchased by customer "
-                    + customer.getId());
-            return new ArrayList<>();
-        }
+    public List<Service> getServicesByCustomer(Customer customer)
+            throws SQLException {
+
+        PreparedStatement statement =
+                connection.prepareStatement(getServicesByCustomerStatement);
+        statement.setLong(1,customer.getId());
+        return getServices(statement);
+
     }
 
     @Override
-    public List<Customer> getCustomersByService(Service service) {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getCustomerByServiceStatement);
-            statement.setLong(1,service.getId());
-            return getCustomers(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get customers who purchased service "
-                    + service.getId());
-            return new ArrayList<>();
-        }
+    public List<Customer> getCustomersByService(Service service)
+            throws SQLException {
+
+        PreparedStatement statement =
+                connection.prepareStatement(getCustomerByServiceStatement);
+        statement.setLong(1,service.getId());
+        return getCustomers(statement);
+
     }
 
     //TODO
     @Override
-    public int getCustomersMonthlyBill(Customer customer) {
+    public int getCustomersMonthlyBill(Customer customer)
+            throws SQLException {
         int res = 0;
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getCustomerMonthlyBillStatement);
-            statement.setLong(1,customer.getId());
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.next()){
-                res = resultSet.getInt(1);
-            }
+        PreparedStatement statement =
+                connection.prepareStatement(getCustomerMonthlyBillStatement);
+        statement.setLong(1,customer.getId());
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next())
+            res = resultSet.getInt(1);
 
-        } catch (SQLException e) {
-            System.out.println("failed to get monthly bill of customer with id "
-                    + customer.getId());
-        }
         return res;
     }
 }

@@ -94,70 +94,55 @@ public class CustomerDao extends Crud<Customer> implements ICustomerDao {
 
 
     @Override
-    public List<Customer> getOlderThan(int age) {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getOlderThanStatement);
-            statement.setInt(1,age);
-            return getEntities(statement);
+    public List<Customer> getOlderThan(int age) throws SQLException {
 
-        } catch (SQLException e) {
-            System.out.println("failed to get subscribers older than " + age);
-            return new ArrayList<>();
-        }
+        PreparedStatement statement =
+                connection.prepareStatement(getOlderThanStatement);
+        statement.setInt(1,age);
+        return getEntities(statement);
+
+
     }
 
 
     @Override
-    public List<Customer> getByName(String name) {
+    public List<Customer> getByName(String name) throws SQLException {
         return getByStringField(getByNameStatement,name);
     }
 
     @Override
-    public List<Customer> getByPhone(String phone) {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getByPhoneStatement);
-            statement.setString(1,phone);
-            return getEntities(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get subscribers with phone "
-                    + phone);
-            return new ArrayList<>();
-        }
+    public List<Customer> getByPhone(String phone) throws SQLException {
+
+        PreparedStatement statement =
+                connection.prepareStatement(getByPhoneStatement);
+        statement.setString(1,phone);
+        return getEntities(statement);
+
 
     }
 
     @Override
-    public List<Customer> getByCity(String city) {
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(getByCityStatement);
-            statement.setString(1,city);
-            return getEntities(statement);
-        } catch (SQLException e) {
-            System.out.println("failed to get subscriber with city "
-                    + city);
-            return new ArrayList<>();
-        }
+    public List<Customer> getByCity(String city) throws SQLException {
+
+        PreparedStatement statement =
+                connection.prepareStatement(getByCityStatement);
+        statement.setString(1,city);
+        return getEntities(statement);
+
 
     }
 
 
 
     @Override
-    public int deleteByCity(String city) {
+    public int deleteByCity(String city) throws SQLException {
         int deleted = 0;
-        try {
-            PreparedStatement statement =
-                    connection.prepareStatement(deleteByCityStatement);
-            statement.setString(1,city);
-            deleted = statement.executeUpdate();
 
-        } catch (SQLException e) {
-            System.out.println("failed to delete subscriber with city"
-                    + city);
-        }
+        PreparedStatement statement =
+                connection.prepareStatement(deleteByCityStatement);
+        statement.setString(1,city);
+        deleted = statement.executeUpdate();
+
 
         return deleted;
     }
