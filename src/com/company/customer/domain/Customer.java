@@ -1,8 +1,8 @@
-package com.company.subscriber.domain;
+package com.company.customer.domain;
 
 import com.company.common.IEntity;
 
-public class Subscriber implements IEntity {
+public class Customer implements IEntity {
 
     private Long id;
     private String name;
@@ -12,8 +12,8 @@ public class Subscriber implements IEntity {
     private String street;
 
 
-    public Subscriber(Long id, String name, Integer age,
-                      String phone, String city, String street) {
+    public Customer(Long id, String name, Integer age,
+                    String phone, String city, String street) {
         this.id = id;
         this.name = name;
         this.age = age;

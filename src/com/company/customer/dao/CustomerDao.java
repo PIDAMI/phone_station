@@ -1,8 +1,8 @@
-package com.company.subscriber.dao;
+package com.company.customer.dao;
 
 import com.company.common.Crud;
-import com.company.subscriber.common.ISubscriberDao;
-import com.company.subscriber.domain.Subscriber;
+import com.company.customer.common.ICustomerDao;
+import com.company.customer.domain.Customer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,9 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
+public class CustomerDao extends Crud<Customer> implements ICustomerDao {
 
-    private enum Fields{
+    public enum Fields{
         ID("id"),
         NAME("name"),
         AGE("age"),
@@ -33,7 +33,7 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
     }
 
 
-    private final String table = "subscriber";
+    public static final String table = "subscriber";
 
 
     private final String getOlderThanStatement = "SELECT * FROM " + table +
@@ -53,7 +53,7 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
 
 
 
-    public SubscriberDao(Connection connection) {
+    public CustomerDao(Connection connection) {
         super(connection,"subscriber",
                 Arrays.stream(Fields.values())
                         .filter(w->!w.equals(Fields.ID))
@@ -62,13 +62,13 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
     }
 
     @Override
-    protected List<Subscriber> getEntities(PreparedStatement statement)
+    protected List<Customer> getEntities(PreparedStatement statement)
             throws SQLException {
 
-        List<Subscriber> subscribers = new ArrayList<>();
+        List<Customer> customers = new ArrayList<>();
         ResultSet rs = statement.executeQuery();
         while (rs.next()){
-            subscribers.add(new Subscriber(
+            customers.add(new Customer(
                     rs.getLong(Fields.ID.toString()),
                     rs.getString(Fields.NAME.toString()),
                     rs.getInt(Fields.AGE.toString()),
@@ -77,13 +77,13 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
                     rs.getString(Fields.STREET.toString()))
             );
         }
-        return subscribers;
+        return customers;
     }
 
 
 
     @Override
-    protected void fillStatement(PreparedStatement statement, Subscriber entity)
+    protected void fillStatement(PreparedStatement statement, Customer entity)
             throws SQLException {
         statement.setString(1,entity.getName());
         statement.setInt(2,entity.getAge());
@@ -94,7 +94,7 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
 
 
     @Override
-    public List<Subscriber> getOlderThan(int age) {
+    public List<Customer> getOlderThan(int age) {
         try {
             PreparedStatement statement =
                     connection.prepareStatement(getOlderThanStatement);
@@ -109,12 +109,12 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
 
 
     @Override
-    public List<Subscriber> getByName(String name) {
+    public List<Customer> getByName(String name) {
         return getByStringField(getByNameStatement,name);
     }
 
     @Override
-    public List<Subscriber> getByPhone(String phone) {
+    public List<Customer> getByPhone(String phone) {
         try {
             PreparedStatement statement =
                     connection.prepareStatement(getByPhoneStatement);
@@ -129,7 +129,7 @@ public class SubscriberDao extends Crud<Subscriber> implements ISubscriberDao{
     }
 
     @Override
-    public List<Subscriber> getByCity(String city) {
+    public List<Customer> getByCity(String city) {
         try {
             PreparedStatement statement =
                     connection.prepareStatement(getByCityStatement);

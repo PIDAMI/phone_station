@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public abstract class Crud<T extends IEntity> implements ICrud<T>{
 
@@ -45,7 +46,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
 
 
 
-    private String getStatement(Long id){
+    private String getStatement(){
         return "SELECT * FROM " + table + " WHERE "
                 + id_field + "=?";
     }
@@ -85,6 +86,11 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
     abstract protected List<T> getEntities(PreparedStatement statement)
             throws SQLException;
 
+//
+//    abstract protected List<T> getEntities(PreparedStatement statement,
+//                                           Callable<T> constructor) throws SQLException;
+
+
 
     abstract protected void fillStatement(PreparedStatement statement, T entity)
             throws SQLException;
@@ -115,6 +121,33 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
             return new ArrayList<>();
         }
     }
+
+    protected List<T> getByBoolField(String query,Boolean field){
+        try {
+            PreparedStatement statement =
+                    connection.prepareStatement(query);
+            statement.setBoolean(1,field);
+            return getEntities(statement);
+        } catch (SQLException e) {
+            System.out.println("failed to get entries with value"
+                    + field);
+            return new ArrayList<>();
+        }
+    }
+
+//    protected List<T> getByLongField(String query,Long field){
+//        try {
+//            PreparedStatement statement =
+//                    connection.prepareStatement(query);
+//            statement.setLong(1,field);
+//            return getEntities(statement);
+//        } catch (SQLException e) {
+//            System.out.println("failed to get entries with value"
+//                    + field);
+//            return new ArrayList<>();
+//        }
+//    }
+
 
     @Override
     public String getTableName() {
@@ -157,7 +190,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
         T res = null;
         try {
             PreparedStatement statement =
-                    connection.prepareStatement(getStatement(id));
+                    connection.prepareStatement(getStatement());
             statement.setLong(1,id);
             List<T> entities = getEntities(statement);
             if (entities.size() > 0)

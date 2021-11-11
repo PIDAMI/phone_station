@@ -1,11 +1,8 @@
 package com.company.service.dao;
 
 import com.company.common.Crud;
-import com.company.common.ICrud;
 import com.company.service.common.IServiceDao;
 import com.company.service.domain.Service;
-import com.company.subscriber.dao.SubscriberDao;
-import com.company.subscriber.domain.Subscriber;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +15,7 @@ import java.util.List;
 public class ServiceDao extends Crud<Service> implements IServiceDao {
 
 
-    private enum Fields{
+    public enum Fields{
         ID("id"),
         TITLE("title"),
         COST("cost"),
@@ -33,7 +30,7 @@ public class ServiceDao extends Crud<Service> implements IServiceDao {
         public String toStringWithQM(){return val + "=?";}
     }
 
-    private final String table = "service";
+    public static final String table = "service";
 
     private final String getByTitleStatement = "SELECT * FROM " + table +
             " WHERE " + Fields.TITLE.toStringWithQM();
