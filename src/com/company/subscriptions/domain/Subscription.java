@@ -3,6 +3,7 @@ package com.company.subscriptions.domain;
 import com.company.common.IEntity;
 
 import java.sql.Date;
+import java.util.Arrays;
 
 public class Subscription implements IEntity {
 
@@ -19,6 +20,24 @@ public class Subscription implements IEntity {
         this.serviceId = serviceId;
         this.beginDate = beginDate;
         this.isActive = isActive;
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
+
+        String repres = Arrays.stream(getClass().getDeclaredFields())
+                .map(s-> {
+                    try {
+                        return s.getName() + ":" + s.get(this) + ",";
+                    } catch (IllegalAccessException e) {
+                        return s.getName() + ":cant reach field,";
+                    }
+                })
+                .reduce("[",(acc,s)->acc+s);
+        builder.append(repres);
+        builder.setCharAt(builder.length()-1,']');
+        return builder.toString();
     }
 
     public void setId(Long id) {

@@ -25,9 +25,9 @@ public class ServiceDao extends Crud<Service> implements IServiceDao {
         Fields(String val){this.val=val;}
 
         @Override
-        public String toString() {return val;}
+        public String toString() {return table + "." + val;}
 
-        public String toStringWithQM(){return val + "=?";}
+        public String toStringWithQM(){return toString() + "=?";}
     }
 
     public static final String table = "service";
@@ -43,7 +43,7 @@ public class ServiceDao extends Crud<Service> implements IServiceDao {
 
     public ServiceDao(Connection connection) {
 
-        super(connection,"subscriber",
+        super(connection,"service",
                 Arrays.stream(ServiceDao.Fields.values())
                         .filter(w->!w.equals(ServiceDao.Fields.ID))
                         .map(ServiceDao.Fields::toString).toList(),

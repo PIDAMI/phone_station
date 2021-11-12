@@ -31,9 +31,9 @@ public class SubscriptionDao extends Crud<Subscription> implements ISubscription
         Fields(String val){this.val=val;}
 
         @Override
-        public String toString() {return val;}
+        public String toString() {return table + "." + val;}
 
-        public String toStringWithQM(){return val + "=?";}
+        public String toStringWithQM(){return toString() + "=?";}
     }
 
     private final String getActiveStatement =
@@ -48,14 +48,14 @@ public class SubscriptionDao extends Crud<Subscription> implements ISubscription
             " JOIN " + this.table +
             " ON " + SubscriptionDao.Fields.SERVICE_ID.toString() +
                     "=" + ServiceDao.Fields.ID.toString()+
-            " WHERE " + SubscriptionDao.Fields.SERVICE_ID.toStringWithQM();
+            " WHERE " + SubscriptionDao.Fields.CUSTOMER_ID.toStringWithQM();
 
     private final String getCustomerByServiceStatement =
             "SELECT * FROM " + CustomerDao.table +
             " JOIN " + this.table +
             " ON " + SubscriptionDao.Fields.CUSTOMER_ID.toString() +
                 "=" + CustomerDao.Fields.ID.toString()+
-            " WHERE " + SubscriptionDao.Fields.CUSTOMER_ID.toStringWithQM();
+            " WHERE " + SubscriptionDao.Fields.SERVICE_ID.toStringWithQM();
 
 
     private final String getCustomerMonthlyBillStatement =
@@ -87,6 +87,7 @@ public class SubscriptionDao extends Crud<Subscription> implements ISubscription
             List<Service> services = new ArrayList<>();
             ResultSet rs = statement.executeQuery();
             while (rs.next()){
+                System.out.println("get service got id " + rs.getLong(ServiceDao.Fields.ID.toString()));
                 services.add(new Service(
                         rs.getLong(ServiceDao.Fields.ID.toString()),
                         rs.getString(ServiceDao.Fields.TITLE.toString()),

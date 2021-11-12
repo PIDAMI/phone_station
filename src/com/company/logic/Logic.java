@@ -12,10 +12,7 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Logic {
@@ -23,7 +20,7 @@ public class Logic {
     private final ServiceDao serviceDao;
     private final CustomerDao customerDao;
     private final SubscriptionDao subscriptionDao;
-    private Connection connection;
+    private Connection connection = null;
 
 
     // JDBC driver name and database URL
@@ -38,31 +35,42 @@ public class Logic {
 
 
     private enum Action{
-        ADD_SUBSCRIPTION,
-        DELETE_INACTIVE_SUBSCRIPTION,
-        GET_ALL_SERVICE_SUBSCRIBERS,
-        GET_ALL_CUSTOMERS_SUBSCRIPTIONS,
-        GET_CUSTOMER_BILL_NEXT_MONTH,
+        ADD_SUBSCRIPTION(1),
+        DELETE_INACTIVE_SUBSCRIPTION(2),
+        GET_ALL_SERVICE_SUBSCRIBERS(3),
+        GET_ALL_CUSTOMERS_SUBSCRIPTIONS(4),
+        GET_CUSTOMER_BILL_NEXT_MONTH(5),
+        EXIT(6);
+
+        int val;
+        Action(int val){this.val=val;}
+        static public Action getByInt(int val){
+            for (Action a:Action.values()){
+                if (a.val == val)
+                    return a;
+            }
+            return null;
+        }
 
     }
 
-    public static String getObjRepresent(Object obj){
 
-        StringBuilder builder = new StringBuilder();
 
-        String repres = Arrays.stream(obj.getClass().getDeclaredFields())
-                .map(s-> {
-                    try {
-                        return s.getName() + ":" + s.get(obj) + ",";
-                    } catch (IllegalAccessException e) {
-                        return s.getName() + ":cant reach field,";
-                    }
-                })
-                .reduce("[",(acc,s)->acc+s);
-        builder.append(repres);
-        builder.setCharAt(builder.length()-1,']');
-        return builder.toString();
-
+    private void getCustomerBillNextMonth() throws SQLException {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter customer id : ");
+        try {
+            Long customerId = Long.parseLong(scanner.next());
+            Customer customer = customerDao.get(customerId);
+            if (customer == null){
+                System.out.println("Customer not found, return to menu");
+                return;
+            }
+            int bill = subscriptionDao.getCustomersMonthlyBill(customer);
+            System.out.println("Customer's bill for next month is " + bill);
+        } catch (NumberFormatException e){
+            System.out.println("id must be a number");
+        }
     }
 
 
@@ -83,8 +91,9 @@ public class Logic {
             }
             List<Customer> customers = subscriptionDao
                     .getCustomersByService(service);
-            for (Customer c:customers)
+            for (Customer c:customers){
                 System.out.println(c);
+            }
        } catch (NumberFormatException e){
             System.out.println("id must be a number");
         }
@@ -105,8 +114,9 @@ public class Logic {
             }
             List<Service> services = subscriptionDao
                     .getServicesByCustomer(customer);
-            for (Service s:services)
+            for (Service s:services){
                 System.out.println(s);
+            }
         } catch (NumberFormatException e){
             System.out.println("id must be a number");
         }
@@ -114,8 +124,10 @@ public class Logic {
     }
 
 
-    private void addSubToExistingCustomer(Scanner scanner, Long customerId) throws SQLException {
+    private void addSubToExistingCustomer(Scanner scanner, Long customerId)
+            throws SQLException {
 
+//            System.out.println("Enter the action");
             Customer customer = customerDao.get(customerId);
             if (customer == null){
                 System.out.println("Not found, registering new customer");
@@ -146,7 +158,7 @@ public class Logic {
         String isRegistered = scanner.next().toLowerCase();
         if (isRegistered.equals("y")){
             System.out.println("Enter customer id: ");
-            Long customerId = Long.getLong(scanner.next());
+            Long customerId = Long.getLong(scanner.next()); // TODO: id is null somehow
             addSubToExistingCustomer(scanner, customerId);
         } else if (isRegistered.equals("n")){
             System.out.println("Enter name: ");
@@ -170,28 +182,71 @@ public class Logic {
     }
 
 
-//    public void processInput(Action action){
-//        switch (action){
-//            case ADD_CUSTOMER:
-//
-//
-//        }
-//    }
+
+    public boolean processInput(Action action){
+        boolean continueProgram = true;
+        try {
+            switch (action) {
+                case ADD_SUBSCRIPTION -> addSubscription();
+                case DELETE_INACTIVE_SUBSCRIPTION -> deleteInactive();
+                case GET_ALL_SERVICE_SUBSCRIBERS -> getAllServiceSubscribers();
+                case GET_ALL_CUSTOMERS_SUBSCRIPTIONS -> getAllCustomerSubscriptions();
+                case GET_CUSTOMER_BILL_NEXT_MONTH -> getCustomerBillNextMonth();
+                case EXIT -> continueProgram = false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return continueProgram;
+    }
 
 
     Logic() throws SQLException, ClassNotFoundException {
         Class.forName(JDBC_DRIVER);
         connection = DriverManager.getConnection(DB_URL, USER, PASS);
-        System.out.println("connection is set!");
         serviceDao = new ServiceDao(connection);
         customerDao = new CustomerDao(connection);
         subscriptionDao = new SubscriptionDao(connection);
     }
 
-    public static void main(String[] args) {
 
-        Customer c = new Customer(1L,"",12,"","","");
-        System.out.println(c.toString());
+    public void closeConnection(){
+        if (null != connection) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.out.println("error while closing connection");
+            }
+        }
+    }
+
+
+    public static void main(String[] args) {
+        Logic l = null;
+        try {
+            l = new Logic();
+            Scanner scanner = new Scanner(System.in);
+            boolean continueRun = true;
+            do {
+                System.out.println("Enter the command: ");
+                Action action = Action.getByInt(scanner.nextInt());
+                if (action == null){
+                    System.out.println("invalid action symbol");
+                    continue;
+                }
+                continueRun = l.processInput(action);
+            } while (continueRun);
+
+        } catch (SQLException throwables) {
+            System.out.println("cant connect to db");
+        } catch (InputMismatchException e) {
+            System.out.println("invalid action symbol");
+        } catch (ClassNotFoundException e) {
+            System.out.println("driver class not found");
+        } finally {
+            if (l != null)
+                l.closeConnection();
+        }
 
 
 //        try{

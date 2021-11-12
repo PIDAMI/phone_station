@@ -2,6 +2,8 @@ package com.company.service.domain;
 
 import com.company.common.IEntity;
 
+import java.util.Arrays;
+
 public class Service implements IEntity {
 
     private Long id;
@@ -15,7 +17,23 @@ public class Service implements IEntity {
         this.cost = cost;
         this.duration = duration;
     }
+    @Override
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
 
+        String repres = Arrays.stream(getClass().getDeclaredFields())
+                .map(s-> {
+                    try {
+                        return s.getName() + ":" + s.get(this) + ",";
+                    } catch (IllegalAccessException e) {
+                        return s.getName() + ":cant reach field,";
+                    }
+                })
+                .reduce("[",(acc,s)->acc+s);
+        builder.append(repres);
+        builder.setCharAt(builder.length()-1,']');
+        return builder.toString();
+    }
 
     @Override
     public Long getId() {

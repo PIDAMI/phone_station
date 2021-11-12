@@ -29,6 +29,24 @@ public class Customer implements IEntity {
     }
 
 
+    @Override
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
+
+        String repres = Arrays.stream(getClass().getDeclaredFields())
+                .map(s-> {
+                    try {
+                        return s.getName() + ":" + s.get(this) + ",";
+                    } catch (IllegalAccessException e) {
+                        return s.getName() + ":cant reach field,";
+                    }
+                })
+                .reduce("[",(acc,s)->acc+s);
+        builder.append(repres);
+        builder.setCharAt(builder.length()-1,']');
+        return builder.toString();
+    }
+
 
     public void setName(String name) {
         this.name = name;

@@ -27,13 +27,13 @@ public class CustomerDao extends Crud<Customer> implements ICustomerDao {
         Fields(String val){this.val=val;}
 
         @Override
-        public String toString() {return val;}
+        public String toString() {return table + "." + val;}
 
-        public String toStringWithQM(){return val + "=?";}
+        public String toStringWithQM(){return toString() + "=?";}
     }
 
 
-    public static final String table = "subscriber";
+    public static final String table = "customer";
 
 
     private final String getOlderThanStatement = "SELECT * FROM " + table +
@@ -54,7 +54,7 @@ public class CustomerDao extends Crud<Customer> implements ICustomerDao {
 
 
     public CustomerDao(Connection connection) {
-        super(connection,"subscriber",
+        super(connection,"customer",
                 Arrays.stream(Fields.values())
                         .filter(w->!w.equals(Fields.ID))
                         .map(Fields::toString).toList(),
