@@ -9,3 +9,5 @@ which contains of city and street. Services have title, cost and time period for
 a table of all subscriber-service entries.
 
 
+
+SQL queries creating tables and inserting test data are stored in src/main/resources.
