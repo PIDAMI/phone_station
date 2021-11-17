@@ -1,6 +1,5 @@
-package common;
+package domain;
 
-import java.util.Arrays;
 
 public interface IEntity {
 

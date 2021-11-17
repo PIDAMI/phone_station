@@ -1,6 +1,4 @@
-package subscriptions.domain;
-
-import common.IEntity;
+package domain;
 
 import java.sql.Date;
 

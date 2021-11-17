@@ -1,12 +1,12 @@
 package logic;
 
-import common.IEntity;
-import customer.dao.CustomerDao;
-import customer.domain.Customer;
-import service.dao.ServiceDao;
-import service.domain.Service;
-import subscriptions.dao.SubscriptionDao;
-import subscriptions.domain.Subscription;
+import domain.IEntity;
+import dao.CustomerDao;
+import domain.Customer;
+import dao.ServiceDao;
+import domain.Service;
+import dao.SubscriptionDao;
+import domain.Subscription;
 
 import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
@@ -30,14 +30,14 @@ public class Logic {
 
 
     // JDBC driver name and database URL
-    private String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+    private String JDBC_DRIVER ;
 
 
-    private String DB_URL = "jdbc:mysql://localhost:3306/phone_service";
+    private String DB_URL ;
 
     //  Database credentials
-    private String USER = "phone_service";
-    private String PASS = "password";
+    private String USER;
+    private String PASS;
 
 
     private enum Action{
@@ -240,15 +240,19 @@ public class Logic {
         HashMap<String,String> params = config.getParams();
         for (String key: params.keySet()){
             String value = params.get(key);
-            switch (value){
+            switch (key){
                 case "JDBC_DRIVER":
                     JDBC_DRIVER = value;
+                    break;
                 case "DB_URL":
                     DB_URL = value;
+                    break;
                 case "USER":
                     USER = value;
+                    break;
                 case "PASS":
                     PASS = value;
+                    break;
             }
 
         }
@@ -259,6 +263,7 @@ public class Logic {
             throws SQLException, ClassNotFoundException, FileNotFoundException {
 
         setParameters(propertiesFile);
+
         Class.forName(JDBC_DRIVER);
         connection = DriverManager.getConnection(DB_URL, USER, PASS);
         serviceDao = new ServiceDao(connection);

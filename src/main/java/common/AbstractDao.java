@@ -1,4 +1,6 @@
 package common;
+
+import domain.IEntity;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public abstract class Crud<T extends IEntity> implements ICrud<T>{
+
+// template class with implementation of methods common to every dao
+public abstract class AbstractDao<T extends IEntity>{
 
     private final String table;
     private final List<String> fields; // names of fields except for id
@@ -34,8 +38,8 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
 
 
 
-    public Crud(Connection connection, String table,
-                List<String> fields, String id_field){
+    public AbstractDao(Connection connection, String table,
+                       List<String> fields, String id_field){
         this.connection=connection;
         this.table=table;
         this.fields = fields;
@@ -122,12 +126,12 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
 
 
 
-    @Override
+
     public String getTableName() {
         return table;
     }
 
-    @Override
+
     public Long getTableSize() throws SQLException {
 
         PreparedStatement statement =
@@ -140,7 +144,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
 
     }
 
-    @Override
+
     public Long create(T entity) throws SQLException {
         Long id = 0L;
         PreparedStatement statement =
@@ -153,7 +157,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
         return id;
     }
 
-    @Override
+
     public T get(Long id) throws SQLException {
         T res = null;
 
@@ -168,7 +172,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
         return res;
     }
 
-    @Override
+
     public List<T> getAll() throws SQLException {
 
         PreparedStatement statement =
@@ -180,7 +184,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
 
 
 
-    @Override
+
     public Boolean update(T entity) throws SQLException {
         boolean isSuccess = false;
         PreparedStatement statement =
@@ -193,7 +197,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
         return isSuccess;
     }
 
-    @Override
+
     public Boolean delete(T entity) throws SQLException {
         boolean isSuccess = false;
 
@@ -206,7 +210,7 @@ public abstract class Crud<T extends IEntity> implements ICrud<T>{
         return isSuccess;
     }
 
-    @Override
+
     public Boolean truncate() throws SQLException {
         boolean isSuccess = false;
 

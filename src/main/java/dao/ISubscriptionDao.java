@@ -1,15 +1,13 @@
-package subscriptions.common;
+package dao;
 
-import common.ICrud;
-import customer.domain.Customer;
-import service.domain.Service;
-import subscriptions.domain.Subscription;
+import domain.Customer;
+import domain.Service;
+import domain.Subscription;
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
-public interface ISubscriptionDao extends ICrud<Subscription> {
+public interface ISubscriptionDao{
 
     List<Subscription> getActiveSub() throws SQLException;
     int deleteInactive() throws SQLException; // return num of deleted entries

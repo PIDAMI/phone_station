@@ -1,13 +1,12 @@
-package customer.common;
+package dao;
 
-import common.ICrud;
-import customer.domain.Customer;
+import domain.Customer;
 
 import java.sql.SQLException;
 import java.util.List;
 
 
-public interface ICustomerDao extends ICrud<Customer> {
+public interface ICustomerDao{
 
     List<Customer> getOlderThan(int age) throws SQLException;
     List<Customer> getByName(String name) throws SQLException;

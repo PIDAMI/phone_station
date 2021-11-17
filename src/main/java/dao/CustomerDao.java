@@ -1,8 +1,7 @@
-package customer.dao;
+package dao;
 
-import common.Crud;
-import customer.common.ICustomerDao;
-import customer.domain.Customer;
+import common.AbstractDao;
+import domain.Customer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class CustomerDao extends Crud<Customer> implements ICustomerDao {
+public class CustomerDao extends AbstractDao<Customer> implements ICustomerDao {
 
     public enum Fields{
         ID("id"),

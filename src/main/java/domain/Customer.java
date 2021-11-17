@@ -1,6 +1,4 @@
-package customer.domain;
-
-import common.IEntity;
+package domain;
 
 import java.util.Arrays;
 import java.util.Objects;

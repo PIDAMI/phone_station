@@ -1,8 +1,7 @@
-package service.dao;
+package dao;
 
-import common.Crud;
-import service.common.IServiceDao;
-import service.domain.Service;
+import common.AbstractDao;
+import domain.Service;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ServiceDao extends Crud<Service> implements IServiceDao {
+public class ServiceDao extends AbstractDao<Service> implements IServiceDao {
 
 
     public enum Fields{

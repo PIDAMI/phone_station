@@ -1,12 +1,9 @@
-package subscriptions.dao;
+package dao;
 
-import common.Crud;
-import customer.dao.CustomerDao;
-import customer.domain.Customer;
-import service.dao.ServiceDao;
-import service.domain.Service;
-import subscriptions.common.ISubscriptionDao;
-import subscriptions.domain.Subscription;
+import common.AbstractDao;
+import domain.Customer;
+import domain.Service;
+import domain.Subscription;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,10 +11,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
-public class SubscriptionDao extends Crud<Subscription> implements ISubscriptionDao {
+public class SubscriptionDao extends AbstractDao<Subscription> implements ISubscriptionDao {
 
     public static final String table = "subscription";
     public enum Fields{
